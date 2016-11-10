@@ -1,5 +1,5 @@
 ##
-# Examples of simple zero-knowledge proofs implemented in
+# Examples of simple zero-knowledge proofs implemented in Python
 #
 # More specifically, these are non-interactive, zero-knowledge,
 # proofs of knowledge. They can be analyzed and proven secure
