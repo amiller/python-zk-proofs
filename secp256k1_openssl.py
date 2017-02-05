@@ -1,6 +1,23 @@
 import ctypes
 import ctypes.util
-from serialize import uint256_to_str, uint256_from_str
+import struct
+
+def uint256_from_str(s):
+    """Convert bytes to uint256"""
+    r = 0
+    t = struct.unpack(b"<IIIIIIII", s[:32])
+    for i in range(8):
+        r += t[i] << (i * 32)
+    return r
+
+def uint256_to_str(s):
+    """Convert bytes to uint256"""
+    assert 0 <= s < 2**256
+    t = []
+    for i in range(8):
+        t.append((s >> (i * 32) & 0xffffffff))
+    s = struct.pack(b"<IIIIIIII", *t)
+    return s
 
 _ssl = ctypes.cdll.LoadLibrary(ctypes.util.find_library('ssl') or 'libeay32')
 _ssl.BN_bn2hex.restype = ctypes.c_char_p
