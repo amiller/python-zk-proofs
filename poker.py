@@ -115,7 +115,7 @@ def proof(X, Y, a):
     K = (k*G, k*H)
 
     # use a hash function instead of communicating w/ verifier
-    c = random_oracle_string_to_Zp(str(K))
+    c = sha2_to_long(uint256_to_str(K[1].x.n)[::-1] + uint256_to_str(K[0].x.n)[::-1])
 
     # response
     s = Fp(k + a*c)
@@ -129,7 +129,8 @@ def verify(X, Y, prf):
     assert type(s) is Fp
 
     # Recompute c w/ the information given
-    c = sha2_to_long(str((KX,KY)))
+    c = sha2_to_long(uint256_to_str(KY.x.n)[::-1] + uint256_to_str(KX.x.n)[::-1])
+    print c
 
     assert s.n *G == KX + c*X
     assert s.n *H == KY + c*Y
@@ -143,3 +144,21 @@ def test():
     prf = (K, s) = proof(X,Y, a)
     verify(X,Y, (K, s))
     
+import struct
+
+def uint256_from_str(s):
+    """Convert bytes to uint256"""
+    r = 0
+    t = struct.unpack(b"<IIIIIIII", s[:32])
+    for i in range(8):
+        r += t[i] << (i * 32)
+    return r
+
+def uint256_to_str(s):
+    """Convert bytes to uint256"""
+    assert 0 <= s < 2**256
+    t = []
+    for i in range(8):
+        t.append((s >> (i * 32) & 0xffffffff))
+    s = struct.pack(b"<IIIIIIII", *t)
+    return s
